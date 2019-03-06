@@ -41,6 +41,10 @@ if(POLICY CMP0057)
    cmake_policy(SET CMP0057 NEW)
 endif()
 
+if( NOT LINUX )
+    add_definitions( -DBACKWARD_SYSTEM_UNKNOWN )
+endif()
+
 find_package(ament_cmake QUIET)
 
 if ( ament_cmake_FOUND )
@@ -133,6 +137,7 @@ list(APPEND BT_SOURCE
     3rdparty/tinyXML2/tinyxml2.cpp
     3rdparty/minitrace/minitrace.cpp
     )
+
 if (NOT backward_ros_FOUND)
     list(APPEND BT_SOURCE
         3rdparty/backward-cpp/backward.cpp)
