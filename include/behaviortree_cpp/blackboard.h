@@ -145,7 +145,7 @@ class Blackboard
         {
             const PortInfo& port_info = it->second.port_info;
             auto& previous_any = it->second.value;
-            const auto locked_type = port_info.type();
+            const std::type_info* locked_type = port_info.type();
 
             Any temp(value);
 
@@ -168,7 +168,7 @@ class Blackboard
 
                     throw LogicError( "Blackboard::set() failed: once declared, the type of a port shall not change. "
                                      "Declared type [", demangle( locked_type ),
-                                     "] != current type [", demangle( typeid(T) ),"]" );
+                                     "] != current type [", demangle( &typeid(T) ),"]" );
                 }
             }
             previous_any = std::move(temp);
