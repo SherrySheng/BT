@@ -17,8 +17,8 @@ namespace BT
 {
 
 FallbackNode::FallbackNode(const std::string& name)
-    : ControlNode::ControlNode(name, {} )
-    ,current_child_idx_(0)
+  : ControlNode::ControlNode(name, {} )
+  ,current_child_idx_(0)
 {
     setRegistrationID("Fallback");
 }
@@ -29,44 +29,42 @@ NodeStatus FallbackNode::tick()
 
     setStatus(NodeStatus::RUNNING);
 
-    while (current_child_idx_ < children_count)
-    {
-        TreeNode* current_child_node = children_nodes_[current_child_idx_];
-        const NodeStatus child_status = current_child_node->executeTick();
 
-        switch (child_status)
+    TreeNode* current_child_node = children_nodes_[current_child_idx_];
+    const NodeStatus child_status = current_child_node->executeTick();
+
+    switch (child_status)
+    {
+        case NodeStatus::RUNNING:
         {
-            case NodeStatus::RUNNING:
+            return child_status;
+        }
+        case NodeStatus::SUCCESS:
+        {
+            haltChildren(0);
+            current_child_idx_ = 0;
+            return child_status;
+        }
+        case NodeStatus::FAILURE:
+        {
+            current_child_idx_++;
+            if( current_child_idx_ < children_count )
             {
-                return child_status;
+                return NodeStatus::RUNNING;
             }
-            case NodeStatus::SUCCESS:
-            {
+            else{
                 haltChildren(0);
                 current_child_idx_ = 0;
-                return child_status;
+                return NodeStatus::FAILURE;
             }
-            case NodeStatus::FAILURE:
-            {
-                current_child_idx_++;
-            }
-            break;
+        }
 
-            case NodeStatus::IDLE:
-            {
-                throw LogicError("A child node must never return IDLE");
-            }
-        }   // end switch
-    }       // end while loop
-
-    // The entire while loop completed. This means that all the children returned FAILURE.
-    if (current_child_idx_ == children_count)
-    {
-        haltChildren(0);
-        current_child_idx_ = 0;
-    }
-
-    return NodeStatus::FAILURE;
+        case NodeStatus::IDLE:
+        {
+            throw LogicError("A child node must never return IDLE");
+        }
+    }   // end switch
+    // never reached
 }
 
 void FallbackNode::halt()

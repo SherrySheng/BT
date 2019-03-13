@@ -17,7 +17,7 @@ namespace BT
 {
 
 SequenceStarNode::SequenceStarNode(const std::string& name)
-    : ControlNode::ControlNode(name, {} )
+  : ControlNode::ControlNode(name, {} )
   , current_child_idx_(0)
 {
     setRegistrationID("SequenceStar");
@@ -29,43 +29,41 @@ NodeStatus SequenceStarNode::tick()
 
     setStatus(NodeStatus::RUNNING);
 
-    while (current_child_idx_ < children_count)
-    {
-        TreeNode* current_child_node = children_nodes_[current_child_idx_];
-        const NodeStatus child_status = current_child_node->executeTick();
+    TreeNode* current_child_node = children_nodes_[current_child_idx_];
+    const NodeStatus child_status = current_child_node->executeTick();
 
-        switch (child_status)
+    switch (child_status)
+    {
+        case NodeStatus::RUNNING:
         {
-            case NodeStatus::RUNNING:
+            return child_status;
+        }
+        case NodeStatus::FAILURE:
+        {
+            // DO NOT reset on failure
+            haltChildren(current_child_idx_);
+            return child_status;
+        }
+        case NodeStatus::SUCCESS:
+        {
+            current_child_idx_++;
+            if( current_child_idx_ < children_count )
             {
-                return child_status;
+                return NodeStatus::RUNNING;
             }
-            case NodeStatus::FAILURE:
-            {
-                // DO NOT reset on failure
-                haltChildren(current_child_idx_);
-                return child_status;
+            else{
+                haltChildren(0);
+                current_child_idx_ = 0;
+                return NodeStatus::SUCCESS;
             }
-            case NodeStatus::SUCCESS:
-            {
-                current_child_idx_++;
-            }
-            break;
+        }
 
-            case NodeStatus::IDLE:
-            {
-                throw LogicError("A child node must never return IDLE");
-            }
-        }   // end switch
-    }       // end while loop
-
-    // The entire while loop completed. This means that all the children returned SUCCESS.
-    if (current_child_idx_ == children_count)
-    {
-        haltChildren(0);
-        current_child_idx_ = 0;
-    }
-    return NodeStatus::SUCCESS;
+        case NodeStatus::IDLE:
+        {
+            throw LogicError("A child node must never return IDLE");
+        }
+    }   // end switch
+    // never reached
 }
 
 void SequenceStarNode::halt()

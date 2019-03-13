@@ -18,19 +18,19 @@ namespace BT
 constexpr const char* RetryNode::NUM_ATTEMPTS;
 
 RetryNode::RetryNode(const std::string& name, unsigned int NTries)
-    : DecoratorNode(name, {} ),
-    max_attempts_(NTries),
-    try_index_(0),
-    read_parameter_from_ports_(false)
+  : DecoratorNode(name, {} ),
+  max_attempts_(NTries),
+  try_index_(0),
+  read_parameter_from_ports_(false)
 {
     setRegistrationID("RetryUntilSuccesful");
 }
 
 RetryNode::RetryNode(const std::string& name, const NodeConfiguration& config)
   : DecoratorNode(name, config),
-    max_attempts_(0),
-    try_index_(0),
-    read_parameter_from_ports_(true)
+  max_attempts_(0),
+  try_index_(0),
+  read_parameter_from_ports_(true)
 {
 }
 
@@ -52,38 +52,40 @@ NodeStatus RetryNode::tick()
 
     setStatus(NodeStatus::RUNNING);
 
-    while (try_index_ < max_attempts_)
+    NodeStatus child_state = child_node_->executeTick();
+
+    switch (child_state)
     {
-        NodeStatus child_state = child_node_->executeTick();
-
-        switch (child_state)
+        case NodeStatus::SUCCESS:
         {
-            case NodeStatus::SUCCESS:
-            {
-                try_index_ = 0;
-                return (NodeStatus::SUCCESS);
-            }
+            try_index_ = 0;
+            return (NodeStatus::SUCCESS);
+        }
 
-            case NodeStatus::FAILURE:
-            {
-                try_index_++;
-            }
-            break;
-
-            case NodeStatus::RUNNING:
+        case NodeStatus::FAILURE:
+        {
+            try_index_++;
+            if( try_index_ < max_attempts_)
             {
                 return NodeStatus::RUNNING;
             }
-
-            default:
-            {
-                throw LogicError("A child node must never return IDLE");
+            else{
+                try_index_ = 0;
+                return NodeStatus::FAILURE;
             }
         }
-    }
 
-    try_index_ = 0;
-    return NodeStatus::FAILURE;
+        case NodeStatus::RUNNING:
+        {
+            return NodeStatus::RUNNING;
+        }
+
+        default:
+        {
+            throw LogicError("A child node must never return IDLE");
+        }
+    }
+    // never reached
 }
 
 }

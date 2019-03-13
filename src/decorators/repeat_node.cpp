@@ -18,19 +18,19 @@ namespace BT
 constexpr const char* RepeatNode::NUM_CYCLES;
 
 RepeatNode::RepeatNode(const std::string& name, unsigned int NTries)
-    : DecoratorNode(name, {} ),
-    num_cycles_(NTries),
-    try_index_(0),
-    read_parameter_from_ports_(false)
+  : DecoratorNode(name, {} ),
+  num_cycles_(NTries),
+  try_index_(0),
+  read_parameter_from_ports_(false)
 {
-     setRegistrationID("Repeat");
+    setRegistrationID("Repeat");
 }
 
 RepeatNode::RepeatNode(const std::string& name, const NodeConfiguration& config)
   : DecoratorNode(name, config),
-    num_cycles_(0),
-    try_index_(0),
-    read_parameter_from_ports_(true)
+  num_cycles_(0),
+  try_index_(0),
+  read_parameter_from_ports_(true)
 {
 
 }
@@ -47,38 +47,40 @@ NodeStatus RepeatNode::tick()
 
     setStatus(NodeStatus::RUNNING);
 
-    while (try_index_ < num_cycles_)
+    NodeStatus child_state = child_node_->executeTick();
+
+    switch (child_state)
     {
-        NodeStatus child_state = child_node_->executeTick();
-
-        switch (child_state)
+        case NodeStatus::SUCCESS:
         {
-            case NodeStatus::SUCCESS:
-            {
-                try_index_++;
-            }
-            break;
-
-            case NodeStatus::FAILURE:
-            {
-                try_index_ = 0;
-                return (NodeStatus::FAILURE);
-            }
-
-            case NodeStatus::RUNNING:
+            try_index_++;
+            if( try_index_ < num_cycles_)
             {
                 return NodeStatus::RUNNING;
             }
-
-            default:
-            {
-                throw LogicError("A child node must never return IDLE");
+            else{
+                try_index_ = 0;
+                return NodeStatus::SUCCESS;
             }
         }
-    }
 
-    try_index_ = 0;
-    return NodeStatus::SUCCESS;
+        case NodeStatus::FAILURE:
+        {
+            try_index_ = 0;
+            return (NodeStatus::FAILURE);
+        }
+
+        case NodeStatus::RUNNING:
+        {
+            return NodeStatus::RUNNING;
+        }
+
+        default:
+        {
+            throw LogicError("A child node must never return IDLE");
+        }
+    }
+    // never reached
 }
 
 void RepeatNode::halt()
