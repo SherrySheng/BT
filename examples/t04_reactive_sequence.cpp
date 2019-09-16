@@ -62,7 +62,7 @@ int main()
     using namespace DummyNodes;
 
     BehaviorTreeFactory factory;
-    factory.registerSimpleCondition("BatteryOK", std::bind(CheckBattery));
+    factory.registerSimpleCondition("BatteryOK", std::bind(DummyNodes::CheckBattery));
     factory.registerNodeType<MoveBaseAction>("MoveBase");
     factory.registerNodeType<SaySomething>("SaySomething");
 

@@ -204,16 +204,11 @@ class PortInfo
 {
 
 public:
-  PortInfo( PortDirection direction = PortDirection::INOUT  ):
+    PortInfo( PortDirection direction = PortDirection::INOUT  ):
         _type(direction), _info(nullptr) {}
 
-    PortInfo( PortDirection direction,
-              const std::type_info& type_info,
-              StringConverter conv):
-        _type(direction),
-        _info( &type_info ),
-        _converter(conv)
-    {}
+    PortInfo( PortDirection direction, const std::type_info& type_info, StringConverter conv):
+        _type(direction), _info( &type_info ), _converter(conv) {}
 
     PortDirection direction() const;
 

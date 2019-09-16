@@ -60,7 +60,7 @@ void applyRecursiveVisitor(TreeNode* node, const std::function<void(TreeNode*)>&
     }
 }
 
-void printTreeRecursively(const TreeNode* root_node)
+void printTreeRecursively(const TreeNode* root_node) // 递归打印树
 {
     std::function<void(unsigned, const BT::TreeNode*)> recursivePrint;
 

@@ -180,14 +180,14 @@ void CoroActionNode::setStatusRunningAndYield()
 
 NodeStatus CoroActionNode::executeTick()
 {
-    if( _p->pending_destroy && _p->coro != 0 )
+    if( _p->pending_destroy && _p->coro != 0 )  // _p->coro 为1 则销毁
     {
         coroutine::destroy(_p->coro);
         _p->coro = 0;
         _p->pending_destroy = false;
     }
 
-    if ( _p->coro == 0)
+    if ( _p->coro == 0)  // _p->coro 为0 则创建
     {
         _p->coro = coroutine::create( [this]()
         {

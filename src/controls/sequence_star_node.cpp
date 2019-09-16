@@ -16,9 +16,7 @@
 namespace BT
 {
 
-SequenceStarNode::SequenceStarNode(const std::string& name)
-    : ControlNode::ControlNode(name, {} )
-  , current_child_idx_(0)
+SequenceStarNode::SequenceStarNode(const std::string& name): ControlNode::ControlNode(name, {} ), current_child_idx_(0)
 {
     setRegistrationID("SequenceStar");
 }

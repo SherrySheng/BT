@@ -30,7 +30,7 @@ TreeNode::TreeNode(std::string name, NodeConfiguration config)
 {
 }
 
-NodeStatus TreeNode::executeTick()
+NodeStatus TreeNode::executeTick()  // 对于同步操作节点SyncActionNode, executeTick()只能返回SUCCESS或FAILED
 {
     const NodeStatus status = tick();
     setStatus(status);
@@ -41,11 +41,11 @@ void TreeNode::setStatus(NodeStatus new_status)
 {
     NodeStatus prev_status;
     {
-        std::unique_lock<std::mutex> UniqueLock(state_mutex_);
+        std::unique_lock<std::mutex> UniqueLock(state_mutex_);  //并发编程添加互斥锁
         prev_status = status_;
         status_ = new_status;
     }
-    if (prev_status != new_status)
+    if (prev_status != new_status)  //判断节点状态是否产生改变
     {
         state_condition_variable_.notify_all();
         state_change_signal_.notify(std::chrono::high_resolution_clock::now(), *this, prev_status,

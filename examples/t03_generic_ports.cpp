@@ -37,9 +37,11 @@ template <> inline Position2D convertFromString(StringView str)
 class CalculateGoal: public SyncActionNode
 {
 public:
-    CalculateGoal(const std::string& name, const NodeConfiguration& config):
-        SyncActionNode(name,config)
-    {}
+    CalculateGoal(const std::string& name, const BT::NodeConfiguration& config)
+    : BT::SyncActionNode(name,config)
+    {
+
+    }
 
     NodeStatus tick() override
     {
@@ -47,6 +49,7 @@ public:
         setOutput("goal", mygoal);
         return NodeStatus::SUCCESS;
     }
+
     static PortsList providedPorts()
     {
         return { OutputPort<Position2D>("goal") };
@@ -57,9 +60,11 @@ public:
 class PrintTarget: public SyncActionNode
 {
 public:
-    PrintTarget(const std::string& name, const NodeConfiguration& config):
-        SyncActionNode(name,config)
-    {}
+    PrintTarget(const std::string& name, const BT::NodeConfiguration& config)
+    : SyncActionNode(name,config)
+    {
+
+    }
 
     NodeStatus tick() override
     {
@@ -118,6 +123,7 @@ static const char* xml_text = R"(
 int main()
 {
     using namespace BT;
+//    using namespace DummyNodes;
 
     BehaviorTreeFactory factory;
     factory.registerNodeType<CalculateGoal>("CalculateGoal");

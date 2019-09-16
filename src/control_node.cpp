@@ -30,7 +30,7 @@ unsigned ControlNode::childrenCount() const
     return unsigned(children_nodes_.size());
 }
 
-void ControlNode::halt()
+void ControlNode::halt()  // 停止 所有 树节点
 {
     haltChildren(0);
     setStatus(NodeStatus::IDLE);
@@ -41,7 +41,7 @@ const std::vector<TreeNode*>& ControlNode::children() const
     return children_nodes_;
 }
 
-void ControlNode::haltChildren(unsigned i)
+void ControlNode::haltChildren(unsigned i)  // 停止 第i个 到 最后一个 树节点
 {
     for (size_t j = i; j < children_nodes_.size(); j++)
     {

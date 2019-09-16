@@ -16,9 +16,7 @@
 namespace BT
 {
 
-FallbackNode::FallbackNode(const std::string& name)
-    : ControlNode::ControlNode(name, {} )
-    ,current_child_idx_(0)
+FallbackNode::FallbackNode(const std::string& name): ControlNode::ControlNode(name, {} ), current_child_idx_(0)
 {
     setRegistrationID("Fallback");
 }
@@ -42,7 +40,7 @@ NodeStatus FallbackNode::tick()
             }
             case NodeStatus::SUCCESS:
             {
-                haltChildren(0);
+                haltChildren(0);  // 返回"空闲信号状态"--NodeStatus::IDLE
                 current_child_idx_ = 0;
                 return child_status;
             }
@@ -69,7 +67,7 @@ NodeStatus FallbackNode::tick()
     return NodeStatus::FAILURE;
 }
 
-void FallbackNode::halt()
+void FallbackNode::halt()  // 停止所有节点动作
 {
     current_child_idx_ = 0;
     ControlNode::halt();

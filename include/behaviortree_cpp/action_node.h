@@ -38,7 +38,7 @@ class ActionNodeBase : public LeafNode
     ActionNodeBase(const std::string& name, const NodeConfiguration& config);
     ~ActionNodeBase() override = default;
 
-    virtual NodeType type() const override final
+    virtual NodeType type() const override final  // 不允许后续的派生类覆盖type()方法
     {
         return NodeType::ACTION;
     }
@@ -49,7 +49,7 @@ class ActionNodeBase : public LeafNode
  * explicitly prevents the status RUNNING and doesn't require
  * an implementation of halt().
  */
-class SyncActionNode : public ActionNodeBase
+class SyncActionNode : public ActionNodeBase  // 同步操作节点
 {
   public:
 
@@ -57,10 +57,10 @@ class SyncActionNode : public ActionNodeBase
     ~SyncActionNode() override = default;
 
     /// throws if the derived class return RUNNING.
-    virtual NodeStatus executeTick() override;
+    virtual NodeStatus executeTick() override;  // 若 派生类 返回的节点状态为 RUNNING状态, 则需要throw异常??
 
     /// You don't need to override this
-    virtual void halt() override final
+    virtual void halt() override final  // 不允许派生类重写(覆盖)halt()方法
     {
         setStatus(NodeStatus::IDLE);
     }
@@ -78,7 +78,7 @@ class SyncActionNode : public ActionNodeBase
  * SimpleActionNode is executed synchronously and does not support halting.
  * NodeParameters aren't supported.
  */
-class SimpleActionNode : public SyncActionNode
+class SimpleActionNode : public SyncActionNode  // SimpleActionNode不支持停止功能halt()
 {
   public:
     typedef std::function<NodeStatus(TreeNode&)> TickFunctor;
@@ -102,7 +102,7 @@ class SimpleActionNode : public SyncActionNode
  * The user must implement the methods tick() and halt().
  *
  */
-class AsyncActionNode : public ActionNodeBase
+class AsyncActionNode : public ActionNodeBase  // TODO: 需要再次仔细阅读 "异步操作节点类 AsyncActionNode"
 {
   public:
 
@@ -144,8 +144,8 @@ class AsyncActionNode : public ActionNodeBase
  * It is up to the user to decide when to suspend execution of the Action and resume
  * the parent node, invoking the method setStatusRunningAndYield().
  */
-class CoroActionNode : public ActionNodeBase
-{
+class CoroActionNode : public ActionNodeBase  // 协同活动节点 -- 作为异步操作节点的候补节点()
+{                                             // 它需要使用异步请求/应答接口,建立与外部服务之间的通信
   public:
 
     CoroActionNode(const std::string& name, const NodeConfiguration& config);

@@ -28,7 +28,9 @@ class Blackboard
   protected:
     // This is intentionally protected. Use Blackboard::create instead
     Blackboard(Blackboard::Ptr parent): parent_bb_(parent)
-    {}
+    {
+
+    }
 
   public:
 
@@ -48,7 +50,7 @@ class Blackboard
      *
      * @return the pointer or nullptr if it fails.
      */
-    const Any* getAny(const std::string& key) const
+    const Any* getAny(const std::string& key) const // 最后的“const”限定了函数中不能有任何改变其所属对象成员变量值的功能，如果有则会在编译阶段就报错
     {
         std::unique_lock<std::mutex> lock(mutex_);
 

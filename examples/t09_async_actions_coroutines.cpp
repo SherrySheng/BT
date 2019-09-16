@@ -12,9 +12,10 @@ using namespace BT;
 class MyAsyncAction: public CoroActionNode
 {
   public:
-    MyAsyncAction(const std::string& name):
-        CoroActionNode(name, {})
-    {}
+    MyAsyncAction(const std::string& name) : CoroActionNode(name, {})
+    {
+
+    }
 
   private:
     // This is the ideal skeleton/template of an async action:
@@ -25,11 +26,10 @@ class MyAsyncAction: public CoroActionNode
     //  - A simple way to handle halt().
 
     NodeStatus tick() override
-
     {
         std::cout << name() <<": Started. Send Request to server." << std::endl;
 
-        auto Now = [](){ return std::chrono::high_resolution_clock::now(); };
+        auto Now = [](){ return std::chrono::high_resolution_clock::now(); }; //给Lambda指定一个名称Now
 
         TimePoint initial_time = Now();
         TimePoint time_before_reply = initial_time + std::chrono::milliseconds(100);
@@ -92,7 +92,7 @@ static const char* xml_text = R"(
 
  <root >
      <BehaviorTree>
-        <Timeout msec="150">
+        <Timeout msec="110">
             <SequenceStar name="sequence">
                 <MyAsyncAction name="action_A"/>
                 <MyAsyncAction name="action_B"/>

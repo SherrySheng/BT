@@ -45,7 +45,7 @@ BehaviorTreeFactory::BehaviorTreeFactory()
 
     for( const auto& it: builders_)
     {
-        builtin_IDs_.insert( it.first );
+        builtin_IDs_.insert( it.first ); // set< string > builtin_IDs_;
     }
 }
 
@@ -67,20 +67,20 @@ bool BehaviorTreeFactory::unregisterBuilder(const std::string& ID)
 
 void BehaviorTreeFactory::registerBuilder(const TreeNodeManifest& manifest, const NodeBuilder& builder)
 {
-    auto it = builders_.find( manifest.registration_ID);
+    auto it = builders_.find( manifest.registration_ID);  // unordered_map<string, NodeBuilder> builders_;
     if (it != builders_.end())
     {
         throw BehaviorTreeException("ID [", manifest.registration_ID, "] already registered");
     }
 
     builders_.insert(  {manifest.registration_ID, builder} );
-    manifests_.insert( {manifest.registration_ID, manifest} );
+    manifests_.insert( {manifest.registration_ID, manifest} ); // unordered_map<string, TreeNodeManifest> manifests_;
 }
 
 void BehaviorTreeFactory::registerSimpleCondition(const std::string& ID,
                                                   const SimpleConditionNode::TickFunctor& tick_functor,
                                                   PortsList ports)
-{
+{                                                 // typedef std::function<NodeStatus(TreeNode&)> TickFunctor;
     NodeBuilder builder = [tick_functor, ID](const std::string& name, const NodeConfiguration& config) {
         return std::make_unique<SimpleConditionNode>(name, tick_functor, config);
     };
